@@ -1,22 +1,28 @@
 import { GoogleGenAI } from "@google/genai"
 import { config } from "dotenv"
-import { allFunctions as calendarFunctions } from "./tools/calendar.js";
-import { allFunctions as emailFunctions } from "./tools/email.js";
+import { allDefinitions as calendarDefinitions } from "./tools/calendar.js";
+import { allDefinitions as emailDefinitions } from "./tools/email.js";
 
 config()
+
+const allDefinitions = [...calendarDefinitions, ...emailDefinitions];
+const allDeclarations = allDefinitions.map(definition => definition.declaration);
+
+// nome -> function
+const allFunctions = Object.fromEntries(allDefinitions.map(definition => [definition.declaration.name, definition.function]));
+
+// console.log(allFunctions);
+
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_GENAI_API_KEY,
 })
 
-// nova lista com todas as funções
-const allFunctions = calendarFunctions.concat(emailFunctions);
-
 const contents = [
   {
     role: "user",
     parts: [
-      { text: "Mande uma mensagem bonita de aniversário para minha mãe. O contato é mãe. Gere uma mensagem aleatória e bonita" }
+      { text: "Quais eventos eu tenho no dia 2025-05-01?" }
     ]
   }
 ]
@@ -27,33 +33,50 @@ let response = await ai.models.generateContent({
   config: {
     tools: [
       {
-        functionDeclarations: allFunctions,
+        functionDeclarations: allDeclarations,
       }
     ]
   }
 })
 
+// console.log(response.candidates[0].content.parts[0]);
+
+const functionCall = response.candidates[0].content.parts[0].functionCall
+const functionToExecute = functionCall.name
+const functionParams = functionCall.args
+console.log(functionToExecute, functionParams);
+
+const fn = allFunctions[functionToExecute]
+console.log(fn);
+
+
+const result = fn(functionParams)
+
+console.log(result);
+
+// Mandar o result da função de volta para a IA.
+const functionResponse = {
+  role: "user",
+  parts: [{
+    functionResponse: {
+      name: functionToExecute,
+      response: { result: result }
+    }
+  }]
+}
+
+contents.push(functionResponse);
+
+response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: contents,
+    config: {
+      tools: [
+        {
+          functionDeclarations: allDeclarations
+        }
+      ]
+    }
+});
+
 console.log(response.candidates[0].content.parts[0]);
-
-// contents.push(response.candidates[0].content)
-
-// contents.push({
-//   role: "user",
-//   parts: [
-//     {
-//       functionResponse: {
-//         name: "getTodayDate",
-//         response: {
-//           result: "2025-11-24"
-//         }
-//       }
-//     }
-//   ]
-// })
-
-// response = await ai.models.generateContent({
-//   model: "gemini-2.5-flash",
-//   contents: contents,
-// });
-
-// console.log(response.candidates[0].content);

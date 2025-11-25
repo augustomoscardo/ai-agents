@@ -58,7 +58,7 @@ const calendar = {
 }
 
 const getTodayDate = {
-  funciton: () => {
+  function: () => {
     return "2025-11-24"
   },
   declaration: {
@@ -68,6 +68,9 @@ const getTodayDate = {
 }
 
 const getEvents = {
+  function: ({ date }) => {
+    return calendar[date] ?? [];
+  },
   declaration: {
     name: "getEvents",
     description: "Retorna os eventos do calendário para um determinado dia",
@@ -85,6 +88,14 @@ const getEvents = {
 }
 
 const scheduleEvent = {
+  function: ({ title, date, time, attendees }) => {
+    const eventList = calendar[date] ?? [];
+    eventList.push({ title, time, attendees: attendees ?? [] });
+
+    calendar[date] = eventList;
+
+    return "Evento agendado com sucesso."
+  },
   declaration: {
     name: "scheduleEvent",
     description: "Marca um novo evento na agenda",
@@ -115,6 +126,20 @@ const scheduleEvent = {
 }
 
 const rescheduleEvent = {
+  function: ({ title, date, newTime }) => {
+    const eventList = calendar[date] ?? [];
+    const eventIndex = eventList.findIndex(event => event.title === title);
+
+    if (eventIndex == -1) {
+      return "Evento não encontrado."
+      
+    }
+
+    calendar[date][eventIndex].time = newTime;
+      
+    return "Evento remarcado com sucesso." ;
+
+  },
   declaration: {
     name: "rescheduleEvent",
     description: "Remarca um evento na agenda para um novo horário",
@@ -139,6 +164,6 @@ const rescheduleEvent = {
   }
 }
 
-const allFunctions = [getTodayDate, getEvents, scheduleEvent, rescheduleEvent];
+const allDefinitions = [getTodayDate, getEvents, scheduleEvent, rescheduleEvent];
 
-export { allFunctions };
+export { allDefinitions };

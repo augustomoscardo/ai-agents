@@ -48,7 +48,7 @@ const sendEmail = {
   function: ({ contact, message }) => {
     console.log(`E-mail enviado para ${contact}: ${message}`);
 
-    return "Email enviado com sucesso!";
+    return "E-mail enviado com sucesso!";
   },
   declaration: {
     name: "sendEmail",
@@ -70,6 +70,6 @@ const sendEmail = {
   }
 }
 
-const allFunctions = [getEmails, sendEmail];
+const allDefinitions = [getEmails, sendEmail];
 
-export { allFunctions };
+export { allDefinitions };
