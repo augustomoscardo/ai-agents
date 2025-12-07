@@ -15,7 +15,35 @@ const State = Annotation.Root({
 });
 
 // função que altera o estado 
-function mockAction(state: typeof State) {
+function supervisor(state: typeof State.State) {
+  console.log(`Supervisor escolhendo próximo especialista...`);
+  
+  return {
+    output: [new AIMessage("Olá da AI")],
+  };
+}
+
+function financialSpecialist(state: typeof State.State) {
+  console.log(`Financial Specialist chamado!`);
+  
+  return {
+    executedNodes: 1,
+    output: [new AIMessage("Olá da AI")],
+  };
+}
+
+function schedulingSpecialist(state: typeof State.State) {
+  console.log(`Scheduling Specialist chamado!`);
+  
+  return {
+    executedNodes: 1,
+    output: [new AIMessage("Olá da AI")],
+  };
+}
+
+function commsSpecialist(state: typeof State.State) {
+  console.log(`Comms Specialist chamado!`);
+  
   return {
     executedNodes: 1,
     output: [new AIMessage("Olá da AI")],
@@ -23,9 +51,25 @@ function mockAction(state: typeof State) {
 }
 
 const graph = new StateGraph(State)
-  .addNode("augusto", mockAction)
-  .addEdge(START, "augusto")
-  .addEdge("augusto", END)
+  .addNode("supervisor", supervisor)
+  .addNode("financial_specialist", financialSpecialist)
+  .addNode("scheduling_specialist", schedulingSpecialist)
+  .addNode("comms_specialist", commsSpecialist)
+  .addEdge(START, "supervisor")
+  .addConditionalEdges("supervisor", (state: typeof State.State) => {
+      if(state.executedNodes == 0) {
+          return "financial_specialist";
+      }else if(state.executedNodes == 1){
+          return "scheduling_specialist";
+      }else if(state.executedNodes == 2){
+          return "comms_specialist";
+      }else{
+          return "END";
+      }
+  })
+  .addEdge("financial_specialist", "supervisor")
+  .addEdge("scheduling_specialist", "supervisor")
+  .addEdge("comms_specialist", "supervisor")
   .compile()
 
 const result = await graph.invoke({
@@ -42,4 +86,3 @@ const graphArrayBuffer = await graphImage.arrayBuffer()
 fs.writeFileSync("./graph.png", Buffer.from(graphArrayBuffer));
 // OU
 // fs.writeFileSync("./graph.png", new Uint8Array(graphArrayBuffer));
-console.log(graphArrayBuffer);
