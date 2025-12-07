@@ -9,7 +9,7 @@ const State = Annotation.Root({
     default: () => 0
   }),
   output: Annotation<BaseMessage[]>({
-    reducer: (currentOutput, newOutput) => [...currentOutput, ...newOutput],//currentOutput.concat(newOutput),
+    reducer: (currentOutput, newOutput) => [...currentOutput, ...newOutput],
     default: () => [],
   })
 });
@@ -17,28 +17,22 @@ const State = Annotation.Root({
 // função que altera o estado 
 function mockAction(state: typeof State) {
   return {
+    executedNodes: 1,
     output: [new AIMessage("Olá da AI")],
-  };
-}
-
-function mockAction2(state: typeof State) {
-  return {
-    output: [new HumanMessage("Olá do Humano")],
   };
 }
 
 const graph = new StateGraph(State)
   .addNode("augusto", mockAction)
-  .addNode("brenda", mockAction2)
   .addEdge(START, "augusto")
-  .addEdge("augusto", "brenda")
-  .addEdge("brenda", END)
+  .addEdge("augusto", END)
   .compile()
 
 const result = await graph.invoke({
-  input: new HumanMessage("Início da E aí!"),
+  input: new HumanMessage("E aí!"),
 })
 
+console.log(result);
 
 const drawableGraph = await graph.getGraphAsync()
 const graphImage = await drawableGraph.drawMermaidPng()
