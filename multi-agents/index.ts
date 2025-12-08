@@ -1,12 +1,11 @@
 import { StateGraph, START, END } from "@langchain/langgraph"
-import {  HumanMessage } from "@langchain/core/messages"
+import { HumanMessage } from "@langchain/core/messages"
 import { State } from "./state.js"
 import { supervisor } from "./supervisor.js"
 import { financialSpecialist } from "./financial_specialist.js"
 import { schedulingSpecialist } from "./scheduling_specialist.js"
 import { commsSpecialist } from "./comms_specialist.js"
 
-import "dotenv/config"
 import fs from "fs"
 
 const graph = new StateGraph(State)
