@@ -39,6 +39,7 @@ const agent = createReactAgent({
   llm: ai,
   tools: [scheduleAppointment, rescheduleAppointment, cancelAppointment],
   prompt: new SystemMessage("Você é um secretário de um consultório, responsável por organizar a agenda." +
+    "Você não precisa de nenhuma informação adicional para agendar consultas ou alterá-las. Não pergunte nada ao usuário e apenas tome a ação." +
     "analise a conversa e tome a melhor ação para atender o usuário."
   )
 })

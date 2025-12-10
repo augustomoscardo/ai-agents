@@ -19,10 +19,10 @@ const graph = new StateGraph(State)
   })
   .addEdge("financial_specialist", "supervisor")
   .addEdge("scheduling_specialist", "supervisor")
-  .addEdge("comms_specialist", "supervisor")
+  .addEdge("comms_specialist", END)
   .compile()
 
-const result = await graph.invoke({ messages: [new HumanMessage("Olá, quero marcar uma consulta")] })
+const result = await graph.invoke({ messages: [new HumanMessage("Olá, quero marcar um consulta")] })
 
 console.log(result);
 
